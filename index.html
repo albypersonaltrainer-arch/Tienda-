@@ -1,1255 +1,1423 @@
-import { useEffect, useMemo, useRef } from 'react';
-
-export default function App() {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  const html = useMemo(
-    () => String.raw`<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-  <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GHCnutrition | Beverly Nutrition</title>
-
-    <!-- FUENTE MONTSERRAT PARA CONSEGUIR LA ESTÉTICA PEDIDA -->
+    <title>GHCnutrition - Premium Tech</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-      /* =========================================================
-         VARIABLES DE COLOR
-         ========================================================= */
-      :root {
-        /* COLOR ANALIZADO VISUALMENTE DEL FONDO DEL LOGO */
-        --logo-bg: #eef4f6;
-
-        /* NARANJA PRINCIPAL ANALIZADO VISUALMENTE DEL LOGO */
-        --brand-orange: #ea5a18;
-        --brand-orange-dark: #b94310;
-        --brand-orange-soft: #ff8a4c;
-
-        /* GAMA METÁLICA PARA EL ACERO CEPILLADO */
-        --steel-0: #ffffff;
-        --steel-1: #f7fafc;
-        --steel-2: #dde5ea;
-        --steel-3: #c5cfd6;
-        --steel-4: #9ea8b0;
-        --steel-5: #6d757c;
-        --steel-6: #3a4045;
-
-        /* COLORES DE TEXTO */
-        --ink: #161b1f;
-        --text-soft: #526069;
-
-        /* SOMBRAS */
-        --shadow-soft: 0 14px 34px rgba(24, 30, 35, 0.12);
-        --shadow-strong: 0 22px 50px rgba(18, 22, 26, 0.2);
-      }
-
-      /* =========================================================
-         RESETEO BÁSICO
-         ========================================================= */
-      * {
-        box-sizing: border-box;
-      }
-
-      html {
-        scroll-behavior: smooth;
-      }
-
-      body {
-        margin: 0;
-        font-family: 'Montserrat', sans-serif;
-        color: var(--ink);
-        background:
-          radial-gradient(circle at 20% 0%, rgba(255,255,255,0.85), transparent 24%),
-          radial-gradient(circle at 85% 10%, rgba(255,255,255,0.7), transparent 18%),
-          repeating-linear-gradient(
-            110deg,
-            rgba(255,255,255,0.22) 0px,
-            rgba(255,255,255,0.22) 2px,
-            rgba(0,0,0,0.02) 2px,
-            rgba(0,0,0,0.02) 6px
-          ),
-          linear-gradient(180deg, #f8fbfc 0%, #e9eff3 36%, #d6dee4 100%);
-      }
-
-      a {
-        color: inherit;
-      }
-
-      img {
-        max-width: 100%;
-      }
-
-      button,
-      select {
-        font: inherit;
-      }
-
-      /* =========================================================
-         ESTRUCTURA GENERAL
-         ========================================================= */
-      .page-shell {
-        min-height: 100vh;
-      }
-
-      .container {
-        width: min(1160px, calc(100% - 24px));
-        margin: 0 auto;
-      }
-
-      .section {
-        padding: 24px 0;
-      }
-
-      .section-title {
-        margin: 0 0 10px;
-        font-size: clamp(1.7rem, 5vw, 3rem);
-        line-height: 1;
-        text-transform: uppercase;
-        letter-spacing: -0.03em;
-      }
-
-      .section-copy {
-        margin: 0;
-        color: var(--text-soft);
-        line-height: 1.75;
-      }
-
-      /* =========================================================
-         CABECERA - MISMO COLOR DEL FONDO DEL LOGO
-         ========================================================= */
-      .hero {
-        background: var(--logo-bg);
-        border-bottom: 1px solid rgba(86, 97, 104, 0.12);
-      }
-
-      .hero-inner {
-        padding: 26px 0 28px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        gap: 16px;
-      }
-
-      .hero-chip {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 8px 14px;
-        border-radius: 999px;
-        background: rgba(19, 23, 26, 0.88);
-        color: #fff;
-        font-size: 0.72rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.18em;
-        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
-      }
-
-      .logo-stage {
-        width: min(94vw, 430px);
-        padding: 18px;
-        border-radius: 999px;
-        background:
-          radial-gradient(circle at 50% 26%, rgba(255,255,255,0.95), rgba(255,255,255,0.2) 42%, transparent 62%),
-          linear-gradient(145deg, #9aa4ab 0%, #f8fbfc 22%, #7e868d 51%, #f9fbfc 78%, #6d757c 100%);
-        box-shadow:
-          inset 0 0 0 2px rgba(255,255,255,0.7),
-          inset 0 0 18px rgba(0,0,0,0.2),
-          0 22px 40px rgba(41, 48, 53, 0.18);
-      }
-
-      .logo-ring {
-        padding: 12px;
-        border-radius: 999px;
-        background:
-          linear-gradient(140deg, #646c72 0%, #f0f5f8 20%, #596167 48%, #edf3f6 78%, #5c656c 100%);
-        box-shadow:
-          inset 0 0 0 2px rgba(255,255,255,0.38),
-          inset 0 0 14px rgba(0,0,0,0.25);
-      }
-
-      .logo-core {
-        padding: 18px;
-        border-radius: 999px;
-        background:
-          radial-gradient(circle at center, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.42) 38%, rgba(255,255,255,0.12) 100%),
-          linear-gradient(180deg, #edf2f5 0%, #d6dee4 100%);
-        box-shadow:
-          inset 0 0 0 8px rgba(234, 90, 24, 0.92),
-          inset 0 0 22px rgba(0,0,0,0.14);
-      }
-
-      .logo-img {
-        display: block;
-        width: 100%;
-        height: auto;
-        filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.15));
-      }
-
-      .hero-title {
-        margin: 4px 0 0;
-        max-width: 860px;
-        font-size: clamp(2rem, 7vw, 4.4rem);
-        line-height: 0.94;
-        font-weight: 900;
-        text-transform: uppercase;
-        letter-spacing: -0.05em;
-      }
-
-      .hero-copy {
-        margin: 0;
-        max-width: 820px;
-        color: #4f5d66;
-        line-height: 1.75;
-        font-size: 0.98rem;
-      }
-
-      .hero-actions {
-        width: 100%;
-        display: grid;
-        gap: 12px;
-      }
-
-      /* =========================================================
-         BOTONES
-         ========================================================= */
-      .btn,
-      .btn-secondary,
-      .btn-modal-close {
-        appearance: none;
-        border: 0;
-        border-radius: 16px;
-        min-height: 52px;
-        padding: 14px 18px;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        font-weight: 800;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-        cursor: pointer;
-      }
-
-      .btn {
-        color: #fff;
-        background: linear-gradient(180deg, #ff7b36 0%, var(--brand-orange) 50%, var(--brand-orange-dark) 100%);
-        box-shadow: 0 12px 24px rgba(234, 90, 24, 0.28), inset 0 1px 0 rgba(255,255,255,0.26);
-      }
-
-      .btn-secondary,
-      .btn-modal-close {
-        color: #13181c;
-        background: linear-gradient(180deg, #ffffff 0%, #dce4e9 100%);
-        box-shadow: inset 0 0 0 1px rgba(84, 93, 100, 0.16), 0 10px 20px rgba(25, 31, 36, 0.08);
-      }
-
-      .btn:hover,
-      .btn-secondary:hover,
-      .btn-modal-close:hover {
-        transform: translateY(-2px);
-        filter: brightness(1.02);
-      }
-
-      /* =========================================================
-         OFERTA DEL DÍA
-         ========================================================= */
-      .offer-card {
-        position: relative;
-        overflow: hidden;
-        border-radius: 28px;
-        padding: 22px;
-        background:
-          linear-gradient(135deg, rgba(255,255,255,0.35), rgba(255,255,255,0.06)),
-          linear-gradient(120deg, #51595f 0%, #f1f6f9 18%, #87919a 34%, #f8fbfc 54%, #767f86 73%, #2a3136 100%);
-        border: 1px solid rgba(255,255,255,0.42);
-        box-shadow: var(--shadow-strong);
-      }
-
-      .offer-card::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        background:
-          radial-gradient(circle at 82% 18%, rgba(234, 90, 24, 0.38), transparent 22%),
-          radial-gradient(circle at 10% 85%, rgba(255,255,255,0.26), transparent 26%);
-      }
-
-      .offer-label {
-        display: inline-flex;
-        padding: 8px 12px;
-        border-radius: 999px;
-        background: rgba(17, 21, 24, 0.84);
-        color: #fff;
-        font-size: 0.72rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.16em;
-      }
-
-      .offer-title {
-        position: relative;
-        margin: 14px 0 10px;
-        color: #fff;
-        font-size: clamp(1.8rem, 5vw, 3rem);
-        line-height: 1;
-        text-transform: uppercase;
-      }
-
-      .offer-copy {
-        position: relative;
-        margin: 0 0 16px;
-        max-width: 780px;
-        color: rgba(255,255,255,0.9);
-        line-height: 1.75;
-      }
-
-      .offer-grid {
-        position: relative;
-        display: grid;
-        gap: 12px;
-      }
-
-      .offer-pill {
-        padding: 16px;
-        border-radius: 18px;
-        color: #fff;
-        background: rgba(255,255,255,0.16);
-        backdrop-filter: blur(6px);
-        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18);
-        line-height: 1.6;
-      }
-
-      /* =========================================================
-         CATÁLOGO DE PRODUCTOS
-         ========================================================= */
-      .catalog-head {
-        display: grid;
-        gap: 10px;
-      }
-
-      .catalog-grid {
-        margin-top: 20px;
-        display: grid;
-        gap: 18px;
-      }
-
-      .product-card {
-        overflow: hidden;
-        border-radius: 24px;
-        background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(231,237,241,0.94));
-        border: 1px solid rgba(112, 121, 128, 0.12);
-        box-shadow: var(--shadow-soft);
-      }
-
-      .product-image-wrap {
-        background: linear-gradient(180deg, #edf3f6 0%, #dce4e9 100%);
-        padding: 12px;
-      }
-
-      .product-image {
-        display: block;
-        width: 100%;
-        aspect-ratio: 4 / 3;
-        object-fit: cover;
-        border-radius: 18px;
-      }
-
-      .product-body {
-        padding: 18px;
-      }
-
-      .product-badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 7px 11px;
-        border-radius: 999px;
-        background: rgba(234, 90, 24, 0.12);
-        color: var(--brand-orange-dark);
-        font-size: 0.75rem;
-        font-weight: 800;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-
-      .product-name {
-        margin: 12px 0 8px;
-        font-size: 1.16rem;
-        line-height: 1.2;
-        font-weight: 800;
-      }
-
-      .product-text {
-        margin: 0 0 14px;
-        min-height: 74px;
-        color: var(--text-soft);
-        line-height: 1.7;
-        font-size: 0.94rem;
-      }
-
-      .field-label {
-        display: block;
-        margin-bottom: 8px;
-        color: #36434c;
-        font-size: 0.82rem;
-        font-weight: 800;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-
-      .flavor-select {
-        width: 100%;
-        min-height: 50px;
-        padding: 0 14px;
-        border-radius: 14px;
-        border: 1px solid rgba(104, 114, 121, 0.16);
-        background: linear-gradient(180deg, #ffffff 0%, #e5edf1 100%);
-        color: #182025;
-        font-weight: 600;
-      }
-
-      .price-row {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        gap: 12px;
-        margin: 16px 0;
-      }
-
-      .price-box {
-        display: grid;
-        gap: 4px;
-      }
-
-      .price-label {
-        margin: 0;
-        color: #67757e;
-        font-size: 0.78rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-      }
-
-      .price-value {
-        margin: 0;
-        color: var(--brand-orange-dark);
-        font-size: 1.8rem;
-        line-height: 1;
-        font-weight: 900;
-      }
-
-      .price-note {
-        margin: 0;
-        color: #65727b;
-        text-align: right;
-        font-size: 0.8rem;
-        line-height: 1.45;
-      }
-
-      .product-actions {
-        display: grid;
-        gap: 10px;
-      }
-
-      /* =========================================================
-         ENTREGA
-         ========================================================= */
-      .delivery-box {
-        border-radius: 24px;
-        padding: 24px;
-        color: #fff;
-        background: linear-gradient(180deg, rgba(19, 23, 26, 0.96), rgba(55, 61, 67, 0.94));
-        box-shadow: var(--shadow-strong);
-      }
-
-      .delivery-box .section-copy {
-        color: rgba(255,255,255,0.86);
-      }
-
-      .delivery-box strong {
-        color: var(--brand-orange-soft);
-      }
-
-      /* =========================================================
-         MODALES
-         ========================================================= */
-      .modal-overlay {
-        position: fixed;
-        inset: 0;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 16px;
-        background: rgba(10, 13, 16, 0.72);
-        z-index: 60;
-      }
-
-      .modal-overlay.is-open {
-        display: flex;
-      }
-
-      .modal-panel {
-        width: min(720px, 100%);
-        max-height: 86vh;
-        overflow: auto;
-        border-radius: 26px;
-        padding: 22px;
-        background: linear-gradient(180deg, #fbfdfe 0%, #dce4e8 100%);
-        border: 1px solid rgba(255,255,255,0.7);
-        box-shadow: 0 30px 60px rgba(0,0,0,0.3);
-      }
-
-      .modal-kicker {
-        margin: 0 0 8px;
-        color: var(--brand-orange-dark);
-        font-size: 0.78rem;
-        font-weight: 800;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-      }
-
-      .modal-title {
-        margin: 0 0 10px;
-        font-size: 1.45rem;
-        line-height: 1.15;
-        text-transform: uppercase;
-      }
-
-      .modal-copy,
-      .modal-list {
-        color: #45535c;
-        line-height: 1.75;
-      }
-
-      .modal-list {
-        padding-left: 20px;
-      }
-
-      .modal-actions {
-        margin-top: 18px;
-        display: grid;
-        gap: 10px;
-      }
-
-      /* =========================================================
-         FOOTER
-         ========================================================= */
-      .footer {
-        padding: 20px 0 34px;
-        text-align: center;
-        color: #69757d;
-        font-size: 0.86rem;
-      }
-
-      /* =========================================================
-         RESPONSIVE - MOBILE FIRST
-         ========================================================= */
-      @media (min-width: 760px) {
-        .hero-inner {
-          padding: 38px 0 36px;
+        :root {
+            --metal-base: #b8bdc1;
+            --metal-claro: #d4d8db;
+            --metal-oscuro: #9ea3a8;
+            --metal-sombra: #7a7f84;
+            --naranja-ghc: #FF6B00;
+            --naranja-intenso: #FF7F1A;
+            --texto-principal: #2c3e50;
+            --texto-secundario: #5a6c7d;
+            --fuente-display: 'Orbitron', sans-serif;
+            --fuente-tecnica: 'Rajdhani', sans-serif;
         }
 
-        .hero-actions {
-          width: auto;
-          grid-template-columns: repeat(2, minmax(220px, 1fr));
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .offer-grid {
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+        body {
+            font-family: var(--fuente-tecnica);
+            background: var(--metal-base);
+            background-image: 
+                repeating-linear-gradient(90deg,
+                    transparent, transparent 1px,
+                    rgba(0, 0, 0, 0.03) 1px, rgba(0, 0, 0, 0.03) 2px),
+                repeating-linear-gradient(0deg,
+                    rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 1px,
+                    transparent 1px, transparent 2px),
+                linear-gradient(135deg,
+                    var(--metal-oscuro) 0%, var(--metal-base) 25%,
+                    var(--metal-claro) 50%, var(--metal-base) 75%,
+                    var(--metal-oscuro) 100%);
+            color: var(--texto-principal);
+            line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        .catalog-grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
 
-        .modal-actions {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+        /* ============================================ */
+        /* SCROLL PROGRESS BAR                         */
+        /* ============================================ */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                var(--naranja-ghc), 
+                var(--naranja-intenso));
+            box-shadow: 0 0 10px rgba(255, 107, 0, 0.8);
+            z-index: 9999;
+            transition: width 0.1s ease-out;
         }
-      }
 
-      @media (min-width: 1100px) {
-        .catalog-grid {
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+        /* HEADER */
+        header {
+            padding: 30px 0;
+            background: rgba(154, 163, 168, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+            margin-top: 2px;
         }
-      }
+
+        .header-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* LOGO CON DEGRADADO MEJORADO */
+        .logo-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: 
+                radial-gradient(circle at 30% 30%,
+                    rgba(255, 107, 0, 0.2) 0%,
+                    transparent 50%),
+                radial-gradient(circle at 30% 30%,
+                    var(--metal-claro) 0%,
+                    var(--metal-base) 40%,
+                    var(--metal-oscuro) 100%);
+            border-radius: 50%;
+            box-shadow: 
+                0 15px 45px rgba(0, 0, 0, 0.6),
+                inset 0 5px 10px rgba(255, 255, 255, 0.5),
+                inset 0 -5px 10px rgba(0, 0, 0, 0.5),
+                inset 0 0 0 10px var(--metal-sombra),
+                inset 0 0 0 15px var(--metal-claro),
+                0 0 40px rgba(255, 107, 0, 0.3);
+            border: 3px solid var(--metal-oscuro);
+            animation: logoGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes logoGlow {
+            0%, 100% { box-shadow: 
+                0 15px 45px rgba(0, 0, 0, 0.6),
+                inset 0 5px 10px rgba(255, 255, 255, 0.5),
+                inset 0 -5px 10px rgba(0, 0, 0, 0.5),
+                inset 0 0 0 10px var(--metal-sombra),
+                inset 0 0 0 15px var(--metal-claro),
+                0 0 40px rgba(255, 107, 0, 0.3);
+            }
+            50% { box-shadow: 
+                0 15px 45px rgba(0, 0, 0, 0.6),
+                inset 0 5px 10px rgba(255, 255, 255, 0.5),
+                inset 0 -5px 10px rgba(0, 0, 0, 0.5),
+                inset 0 0 0 10px var(--metal-sombra),
+                inset 0 0 0 15px var(--metal-claro),
+                0 0 60px rgba(255, 107, 0, 0.5);
+            }
+        }
+
+        .logo-container::after {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 40%;
+            height: 40%;
+            background: radial-gradient(circle,
+                rgba(255, 255, 255, 0.5) 0%,
+                transparent 70%);
+            border-radius: 50%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .logo-image {
+            width: 140px;
+            height: auto;
+            position: relative;
+            z-index: 2;
+            filter: drop-shadow(0 6px 15px rgba(0, 0, 0, 0.5));
+        }
+
+        .logo-subtitle {
+            font-family: var(--fuente-display);
+            font-size: 10px;
+            color: var(--texto-secundario);
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        /* OFERTA CON EFECTO RADAR HUD */
+        .oferta-destacada {
+            margin: 30px 0;
+            padding: 0 20px;
+        }
+
+        .oferta-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(212, 216, 219, 0.25);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 107, 0, 0.5);
+            border-radius: 20px;
+            padding: 35px 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 15px 45px rgba(255, 107, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        /* Efecto RADAR rotatorio */
+        .oferta-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                transparent 270deg,
+                rgba(255, 107, 0, 0.8) 300deg,
+                transparent 330deg
+            );
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .oferta-container::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            background: rgba(212, 216, 219, 0.3);
+            backdrop-filter: blur(15px);
+            border-radius: 18px;
+            z-index: 1;
+        }
+
+        .oferta-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .oferta-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--naranja-ghc), var(--naranja-intenso));
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-family: var(--fuente-display);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+            box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* GLOW NEÓN en título de oferta */
+        .oferta-title {
+            font-family: var(--fuente-display);
+            font-size: 30px;
+            font-weight: 900;
+            color: var(--texto-principal);
+            margin-bottom: 12px;
+            text-shadow: 
+                2px 2px 4px rgba(255, 255, 255, 0.3),
+                0 0 20px rgba(255, 107, 0, 0.6),
+                0 0 30px rgba(255, 107, 0, 0.4);
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+
+        .oferta-subtitle {
+            font-family: var(--fuente-tecnica);
+            font-size: 16px;
+            color: var(--texto-secundario);
+            margin-bottom: 18px;
+            font-weight: 600;
+        }
+
+        /* GLOW NEÓN en precio de oferta */
+        .oferta-precio {
+            font-family: var(--fuente-display);
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--naranja-ghc);
+            margin: 18px 0;
+            text-shadow: 
+                0 0 10px rgba(255, 107, 0, 0.8),
+                0 0 20px rgba(255, 107, 0, 0.6),
+                0 0 30px rgba(255, 107, 0, 0.4),
+                0 0 40px rgba(255, 107, 0, 0.2);
+            letter-spacing: -1px;
+            animation: neonPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes neonPulse {
+            0%, 100% { 
+                text-shadow: 
+                    0 0 10px rgba(255, 107, 0, 0.8),
+                    0 0 20px rgba(255, 107, 0, 0.6),
+                    0 0 30px rgba(255, 107, 0, 0.4);
+            }
+            50% { 
+                text-shadow: 
+                    0 0 15px rgba(255, 107, 0, 1),
+                    0 0 30px rgba(255, 107, 0, 0.8),
+                    0 0 45px rgba(255, 107, 0, 0.6);
+            }
+        }
+
+        .oferta-precio small {
+            font-size: 20px;
+            color: var(--texto-secundario);
+            font-weight: 600;
+            text-decoration: line-through;
+            margin-right: 10px;
+            opacity: 0.7;
+            text-shadow: none;
+        }
+
+        /* Botón con efecto de iluminación + FEEDBACK TÁCTIL */
+        .btn-oferta {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--naranja-ghc), var(--naranja-intenso));
+            color: white;
+            padding: 20px 50px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-family: var(--fuente-display);
+            font-weight: 800;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 12px;
+            transition: all 0.15s ease;
+            box-shadow: 
+                0 10px 30px rgba(255, 107, 0, 0.4),
+                inset 0 2px 0 rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .btn-oferta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.3), 
+                transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            50%, 100% { left: 100%; }
+        }
+
+        .btn-oferta:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(255, 107, 0, 0.6);
+        }
+
+        /* FEEDBACK TÁCTIL */
+        .btn-oferta:active {
+            transform: translateY(-1px) scale(0.98);
+            box-shadow: 0 5px 15px rgba(255, 107, 0, 0.5);
+            transition: all 0.05s ease;
+        }
+
+        /* HERO */
+        .hero {
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-family: var(--fuente-display);
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--texto-principal);
+            margin-bottom: 12px;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.2);
+            letter-spacing: 1px;
+        }
+
+        .hero h1 .highlight {
+            color: var(--naranja-ghc);
+            display: block;
+            font-size: 38px;
+            text-shadow: 0 0 20px rgba(255, 107, 0, 0.4);
+        }
+
+        .divider-metal {
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                transparent, var(--naranja-ghc), var(--naranja-intenso), transparent);
+            margin: 15px auto;
+            box-shadow: 0 0 10px rgba(255, 107, 0, 0.5);
+        }
+
+        .hero-subtitle {
+            font-size: 15px;
+            color: var(--texto-secundario);
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 500;
+        }
+
+        /* CATÁLOGO */
+        .products-section {
+            padding: 40px 0 60px;
+        }
+
+        .section-title {
+            font-family: var(--fuente-display);
+            font-size: 26px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--texto-principal);
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.2);
+            letter-spacing: 2px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        /* TARJETAS GLASSMORPHISM */
+        .product-card {
+            background: rgba(212, 216, 219, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .product-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 15px 50px rgba(0, 0, 0, 0.3),
+                0 0 30px rgba(255, 107, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 107, 0, 0.5);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        .product-card h3 {
+            font-family: var(--fuente-display);
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--texto-principal);
+            letter-spacing: 0.5px;
+        }
+
+        .product-benefit {
+            color: var(--texto-secundario);
+            font-size: 13px;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        /* GLOW NEÓN en precios de productos */
+        .product-price {
+            font-family: var(--fuente-display);
+            font-size: 34px;
+            font-weight: 900;
+            color: var(--naranja-ghc);
+            margin: 15px 0;
+            text-shadow: 
+                0 0 10px rgba(255, 107, 0, 0.6),
+                0 0 20px rgba(255, 107, 0, 0.4),
+                0 0 30px rgba(255, 107, 0, 0.2);
+        }
+
+        .product-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .btn-details {
+            background: rgba(154, 163, 168, 0.5);
+            backdrop-filter: blur(5px);
+            color: var(--texto-principal);
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-family: var(--fuente-display);
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            transition: all 0.15s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+        }
+
+        .btn-details:hover {
+            background: rgba(154, 163, 168, 0.7);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* FEEDBACK TÁCTIL */
+        .btn-details:active {
+            transform: translateY(0) scale(0.97);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.05s ease;
+        }
+
+        /* Botón de compra con pulso + FEEDBACK TÁCTIL */
+        .btn-comprar {
+            background: linear-gradient(135deg, var(--naranja-ghc), var(--naranja-intenso));
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-family: var(--fuente-display);
+            font-weight: 800;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-align: center;
+            transition: all 0.15s ease;
+            box-shadow: 0 8px 25px rgba(255, 107, 0, 0.4);
+            display: block;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .btn-comprar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .product-card:hover .btn-comprar::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .product-card:hover .btn-comprar {
+            animation: btnPulse 1.5s ease-in-out infinite;
+            box-shadow: 0 12px 35px rgba(255, 107, 0, 0.6);
+        }
+
+        @keyframes btnPulse {
+            0%, 100% { box-shadow: 0 12px 35px rgba(255, 107, 0, 0.6); }
+            50% { box-shadow: 0 12px 45px rgba(255, 107, 0, 0.8); }
+        }
+
+        /* FEEDBACK TÁCTIL */
+        .btn-comprar:active {
+            transform: scale(0.96);
+            box-shadow: 0 4px 15px rgba(255, 107, 0, 0.5);
+            transition: all 0.05s ease;
+        }
+
+        /* MODAL GLASSMORPHISM */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: rgba(212, 216, 219, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            max-width: 600px;
+            width: 100%;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--naranja-ghc), var(--naranja-intenso));
+            padding: 25px;
+            position: relative;
+            border-radius: 20px 20px 0 0;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(0, 0, 0, 0.5);
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        /* FEEDBACK TÁCTIL */
+        .modal-close:active {
+            transform: rotate(90deg) scale(1.05);
+            transition: all 0.05s ease;
+        }
+
+        .modal-title {
+            font-family: var(--fuente-display);
+            font-size: 22px;
+            font-weight: 800;
+            color: white;
+            margin: 0;
+            letter-spacing: 1px;
+            padding-right: 50px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-image {
+            width: 100%;
+            max-width: 300px;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin: 0 auto 25px;
+            display: block;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-section {
+            margin-bottom: 25px;
+        }
+
+        .modal-section h4 {
+            font-family: var(--fuente-display);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--naranja-ghc);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-section p {
+            color: var(--texto-principal);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .modal-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .modal-section ul li {
+            color: var(--texto-secundario);
+            font-size: 14px;
+            padding: 8px 0;
+            padding-left: 22px;
+            position: relative;
+        }
+
+        .modal-section ul li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--naranja-ghc);
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .como-tomar {
+            background: rgba(255, 107, 0, 0.15);
+            backdrop-filter: blur(5px);
+            border: 2px solid var(--naranja-ghc);
+            border-radius: 10px;
+            padding: 18px;
+            margin: 25px 0;
+        }
+
+        .flavor-selector-modal {
+            margin: 20px 0;
+        }
+
+        .flavor-selector-modal label {
+            display: block;
+            font-family: var(--fuente-display);
+            font-weight: 700;
+            font-size: 12px;
+            margin-bottom: 10px;
+            color: var(--texto-principal);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .flavor-selector-modal select {
+            width: 100%;
+            padding: 14px 16px;
+            font-family: var(--fuente-tecnica);
+            font-size: 15px;
+            font-weight: 600;
+            background: rgba(154, 163, 168, 0.5);
+            backdrop-filter: blur(5px);
+            color: var(--texto-principal);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .flavor-selector-modal select:focus {
+            outline: none;
+            border-color: var(--naranja-ghc);
+            box-shadow: 0 0 15px rgba(255, 107, 0, 0.3);
+        }
+
+        /* GLOW NEÓN en precio del modal */
+        .modal-price {
+            font-family: var(--fuente-display);
+            font-size: 40px;
+            font-weight: 900;
+            color: var(--naranja-ghc);
+            text-align: center;
+            margin: 20px 0;
+            text-shadow: 
+                0 0 15px rgba(255, 107, 0, 0.8),
+                0 0 25px rgba(255, 107, 0, 0.6),
+                0 0 35px rgba(255, 107, 0, 0.4);
+        }
+
+        /* INFORMACIÓN */
+        .info-section {
+            padding: 60px 0;
+            background: rgba(154, 163, 168, 0.2);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .info-title {
+            font-family: var(--fuente-display);
+            font-size: 28px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--texto-principal);
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.2);
+            letter-spacing: 2px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .info-card {
+            background: rgba(212, 216, 219, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 14px;
+            padding: 25px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .info-card h3 {
+            font-family: var(--fuente-display);
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--naranja-ghc);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-card p {
+            color: var(--texto-principal);
+            font-size: 15px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .info-card strong {
+            color: var(--naranja-ghc);
+            font-weight: 700;
+        }
+
+        .faq-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .faq-item {
+            background: rgba(212, 216, 219, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 18px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            transform: translateX(8px);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+        }
+
+        .faq-question {
+            font-family: var(--fuente-display);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--texto-principal);
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .faq-answer {
+            color: var(--texto-secundario);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* FOOTER */
+        footer {
+            padding: 40px 0;
+            text-align: center;
+            background: rgba(122, 127, 132, 0.3);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--texto-secundario);
+            font-size: 13px;
+        }
+
+        footer p {
+            margin: 6px 0;
+        }
+
+        /* RESPONSIVE */
+        @media (min-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 30px;
+            }
+
+            .product-actions {
+                flex-direction: row;
+                gap: 12px;
+            }
+
+            .btn-details, .btn-comprar {
+                flex: 1;
+            }
+
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .info-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Scrollbar personalizado */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(154, 163, 168, 0.2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 107, 0, 0.5);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 107, 0, 0.7);
+        }
     </style>
-  </head>
-  <body>
-    <!-- =======================================================
-         PÁGINA COMPLETA
-         ======================================================= -->
-    <div class="page-shell">
-      <!-- CABECERA PRINCIPAL. EL COLOR BASE ES EL MISMO DEL FONDO DEL LOGO -->
-      <header class="hero">
-        <div class="container hero-inner">
-          <!-- ETIQUETA DECORATIVA SUPERIOR -->
-          <div class="hero-chip">Industrial Premium Nutrition</div>
+</head>
+<body>
 
-          <!-- BLOQUE PRINCIPAL DEL LOGO -->
-          <div class="logo-stage">
-            <div class="logo-ring">
-              <div class="logo-core">
-                <!-- LOGO REAL DEL CLIENTE. NO SUSTITUIR POR TEXTO -->
-                <img src="logo.png" alt="GHCnutrition Logo" class="logo-img">
-              </div>
+    <!-- SCROLL PROGRESS BAR -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-container">
+                    <img src="ghc_logo.png" alt="GHC Nutrition" class="logo-image">
+                </div>
+                <p class="logo-subtitle">Distribuidor Oficial Beverly Nutrition</p>
             </div>
-          </div>
-
-          <!-- TITULAR PRINCIPAL -->
-          <h1 class="hero-title">Catálogo Beverly Nutrition con estética industrial premium</h1>
-
-          <!-- TEXTO PRINCIPAL DE VENTA -->
-          <p class="hero-copy">
-            Una landing de una sola página diseñada para que la marca se sienta como una extensión natural del logo:
-            acero cepillado claro, contraste premium y acentos en naranja para dirigir la atención al precio y a la compra.
-          </p>
-
-          <!-- BOTONES SUPERIORES -->
-          <div class="hero-actions">
-            <a href="#catalogo" class="btn">Ver catálogo</a>
-            <a href="#entrega" class="btn-secondary">Información de entrega</a>
-          </div>
         </div>
-      </header>
+    </header>
 
-      <main>
-        <!-- =====================================================
-             OFERTA DEL DÍA
-             ===================================================== -->
-        <section class="section">
-          <div class="container">
-            <div class="offer-card">
-              <!-- ETIQUETA DE OFERTA -->
-              <div class="offer-label">Oferta del día</div>
-
-              <!-- TITULAR DE LA OFERTA -->
-              <h2 class="offer-title">Rendimiento premium con acabado metálico y compra directa</h2>
-
-              <!-- DESCRIPCIÓN DE LA OFERTA -->
-              <p class="offer-copy">
-                Selección destacada de Beverly Nutrition con una experiencia de compra rápida, profesional y preparada
-                para móvil. El sistema añadirá automáticamente el referido si la URL contiene <strong>?ref=nombre</strong>.
-              </p>
-
-              <!-- BLOQUES RESUMEN DE VENTA -->
-              <div class="offer-grid">
-                <div class="offer-pill"><strong>Producto del día:</strong><br>Muscle Provider con asesoramiento de sabor.</div>
-                <div class="offer-pill"><strong>Ventaja:</strong><br>Enlace SumUp con producto, sabor y referido ya preparados.</div>
-                <div class="offer-pill"><strong>Entrega:</strong><br>Recogida en mano con tu entrenador en el gimnasio.</div>
-              </div>
+    <section class="oferta-destacada">
+        <div class="oferta-container">
+            <div class="oferta-content">
+                <div class="oferta-badge">🔥 OFERTA DEL DÍA EN EL GYM</div>
+                <!-- EDITAR: Título de la oferta -->
+                <h2 class="oferta-title">Beverly Whey Protein 2kg<br>+ Shaker de Regalo</h2>
+                <p class="oferta-subtitle">Proteína premium de máxima calidad con tu shaker oficial Beverly Nutrition</p>
+                <!-- EDITAR: Precio de la oferta -->
+                <div class="oferta-precio">
+                    <small>45€</small> 35€
+                </div>
+                <!-- EDITAR: Enlace SumUp de la oferta -->
+                <a href="https://sumup.me/ghc-oferta-dia" class="btn-oferta" id="btn-oferta-principal">
+                    ¡LA QUIERO!
+                </a>
             </div>
-          </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- =====================================================
-             CABECERA DEL CATÁLOGO
-             ===================================================== -->
-        <section class="section" id="catalogo">
-          <div class="container">
-            <div class="catalog-head">
-              <h2 class="section-title">Catálogo de productos</h2>
-              <p class="section-copy">
-                Elige sabor, revisa la ficha técnica y pulsa comprar. La web capturará el parámetro <strong>?ref=nombre</strong>
-                para pasarlo automáticamente al enlace de pago de SumUp.
-              </p>
+    <section class="hero">
+        <div class="container">
+            <h1>
+                <span class="highlight">GHCnutrition</span>
+                Precisión Industrial
+            </h1>
+            <div class="divider-metal"></div>
+            <p class="hero-subtitle">
+                <strong>Distribuidor Oficial Beverly Nutrition.</strong><br>
+                Paga con tu móvil y recoge en recepción.
+            </p>
+        </div>
+    </section>
+
+    <section class="products-section">
+        <div class="container">
+            <h2 class="section-title">⚙️ CATÁLOGO PREMIUM</h2>
+            <div class="products-grid" id="products-grid"></div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <div class="container">
+            <h2 class="info-title">📋 INFORMACIÓN IMPORTANTE</h2>
+            
+            <div class="info-grid">
+                <!-- EDITAR: Información de envíos -->
+                <div class="info-card">
+                    <h3>📦 ENVÍOS Y ENTREGAS</h3>
+                    <p><strong>Recogida GRATIS</strong> en recepción del gym en menos de 24h (Lunes a Viernes)</p>
+                </div>
+
+                <!-- EDITAR: Gastos de envío -->
+                <div class="info-card">
+                    <h3>🚚 GASTOS DE ENVÍO</h3>
+                    <p>Envío a domicilio: 4,95€<br><strong>¡GRATIS en pedidos superiores a 45€!</strong></p>
+                </div>
+
+                <div class="info-card">
+                    <h3>✅ GARANTÍA GHC</h3>
+                    <p>Productos <strong>100% originales Beverly Nutrition</strong> con sello de seguridad oficial</p>
+                </div>
             </div>
 
-            <!-- ===================================================
-                 CUADRÍCULA DE PRODUCTOS
-                 =================================================== -->
-            <div class="catalog-grid">
-              <!-- PRODUCTO 1 -->
-              <article class="product-card" data-product="Beverly Muscle Provider" data-sumup="https://pay.sumup.com/b2c/QN9WZ3JP">
-                <div class="product-image-wrap">
-                  <!-- EDITAR FOTO AQUÍ -->
-                  <img class="product-image" src="https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?auto=format&fit=crop&w=900&q=80" alt="Beverly Muscle Provider">
-                </div>
-                <div class="product-body">
-                  <div class="product-badge">Proteína premium</div>
-                  <h3 class="product-name">Beverly Muscle Provider</h3>
-                  <p class="product-text">Mezcla proteica de alta gama para quienes buscan sabor premium, saciedad y una textura cremosa durante todo el día.</p>
+            <h3 style="font-family: var(--fuente-display); font-size: 22px; font-weight: 700; text-align: center; margin: 40px 0 30px; color: var(--texto-principal);">❓ PREGUNTAS FRECUENTES</h3>
+            
+            <!-- EDITAR: Preguntas frecuentes -->
+            <ul class="faq-list">
+                <li class="faq-item">
+                    <div class="faq-question">¿Cómo recojo mi pedido?</div>
+                    <div class="faq-answer">Enseña tu comprobante de pago de SumUp (email o SMS) en el mostrador de recepción y recoge tu producto al instante.</div>
+                </li>
+                <li class="faq-item">
+                    <div class="faq-question">¿Es seguro el pago?</div>
+                    <div class="faq-answer">Sí, usamos SumUp con cifrado de alta seguridad. Tus datos están protegidos con los más altos estándares bancarios.</div>
+                </li>
+                <li class="faq-item">
+                    <div class="faq-question">¿Puedo cambiar el sabor?</div>
+                    <div class="faq-answer">Sí, siempre que el bote esté precintado y sin abrir. Acércate a recepción con tu comprobante de compra.</div>
+                </li>
+            </ul>
+        </div>
+    </section>
 
-                  <!-- EDITAR SELECTOR DE SABORES AQUÍ -->
-                  <label class="field-label" for="flavor-1">Elegir sabor</label>
-                  <select class="flavor-select" id="flavor-1">
-                    <option value="Chocolate">Chocolate</option>
-                    <option value="Vainilla">Vainilla</option>
-                    <option value="Cookies">Cookies</option>
-                  </select>
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 GHCnutrition - Distribuidor Oficial Beverly Nutrition</p>
+            <p>Suplementación de precisión industrial para atletas exigentes</p>
+        </div>
+    </footer>
 
-                  <div class="price-row">
-                    <div class="price-box">
-                      <p class="price-label">Precio</p>
-                      <!-- EDITAR PRECIO AQUÍ -->
-                      <p class="price-value">59,90 €</p>
-                    </div>
-                    <p class="price-note">IVA incluido<br>Pago seguro SumUp</p>
-                  </div>
-
-                  <div class="product-actions">
-                    <!-- BOTÓN PARA ABRIR LA FICHA TÉCNICA -->
-                    <button class="btn-secondary" type="button" data-open-modal="modal-1">Ficha Técnica</button>
-
-                    <!-- BOTÓN DE COMPRA. EL SCRIPT AÑADIRÁ REFERIDO Y SABOR -->
-                    <a class="btn buy-link" href="https://pay.sumup.com/b2c/QN9WZ3JP" target="_blank" rel="noopener noreferrer">Comprar (SumUp)</a>
-                  </div>
-                </div>
-              </article>
-
-              <!-- PRODUCTO 2 -->
-              <article class="product-card" data-product="Beverly UMP Ultimate Muscle Protein" data-sumup="https://pay.sumup.com/b2c/Q4Y8L2DK">
-                <div class="product-image-wrap">
-                  <!-- EDITAR FOTO AQUÍ -->
-                  <img class="product-image" src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80" alt="Beverly UMP Ultimate Muscle Protein">
-                </div>
-                <div class="product-body">
-                  <div class="product-badge">Digestión gradual</div>
-                  <h3 class="product-name">Beverly UMP Ultimate Muscle Protein</h3>
-                  <p class="product-text">Proteína versátil para desayunos, meriendas o periodos largos entre comidas con sensación de saciedad y perfil premium.</p>
-
-                  <!-- EDITAR SELECTOR DE SABORES AQUÍ -->
-                  <label class="field-label" for="flavor-2">Elegir sabor</label>
-                  <select class="flavor-select" id="flavor-2">
-                    <option value="Chocolate">Chocolate</option>
-                    <option value="Vainilla">Vainilla</option>
-                    <option value="Cappuccino">Cappuccino</option>
-                  </select>
-
-                  <div class="price-row">
-                    <div class="price-box">
-                      <p class="price-label">Precio</p>
-                      <!-- EDITAR PRECIO AQUÍ -->
-                      <p class="price-value">54,90 €</p>
-                    </div>
-                    <p class="price-note">IVA incluido<br>Pago seguro SumUp</p>
-                  </div>
-
-                  <div class="product-actions">
-                    <button class="btn-secondary" type="button" data-open-modal="modal-2">Ficha Técnica</button>
-                    <a class="btn buy-link" href="https://pay.sumup.com/b2c/Q4Y8L2DK" target="_blank" rel="noopener noreferrer">Comprar (SumUp)</a>
-                  </div>
-                </div>
-              </article>
-
-              <!-- PRODUCTO 3 -->
-              <article class="product-card" data-product="Beverly Mass Amino Acids" data-sumup="https://pay.sumup.com/b2c/QJ7V6M2H">
-                <div class="product-image-wrap">
-                  <!-- EDITAR FOTO AQUÍ -->
-                  <img class="product-image" src="https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?auto=format&fit=crop&w=900&q=80" alt="Beverly Mass Amino Acids">
-                </div>
-                <div class="product-body">
-                  <div class="product-badge">Recuperación muscular</div>
-                  <h3 class="product-name">Beverly Mass Amino Acids</h3>
-                  <p class="product-text">Complejo de aminoácidos orientado a acompañar entrenamientos exigentes, etapas de volumen y recuperación diaria.</p>
-
-                  <!-- EDITAR SELECTOR DE SABORES AQUÍ -->
-                  <label class="field-label" for="flavor-3">Elegir formato</label>
-                  <select class="flavor-select" id="flavor-3">
-                    <option value="Sin sabor">Sin sabor</option>
-                    <option value="Formato original">Formato original</option>
-                  </select>
-
-                  <div class="price-row">
-                    <div class="price-box">
-                      <p class="price-label">Precio</p>
-                      <!-- EDITAR PRECIO AQUÍ -->
-                      <p class="price-value">49,90 €</p>
-                    </div>
-                    <p class="price-note">IVA incluido<br>Pago seguro SumUp</p>
-                  </div>
-
-                  <div class="product-actions">
-                    <button class="btn-secondary" type="button" data-open-modal="modal-3">Ficha Técnica</button>
-                    <a class="btn buy-link" href="https://pay.sumup.com/b2c/QJ7V6M2H" target="_blank" rel="noopener noreferrer">Comprar (SumUp)</a>
-                  </div>
-                </div>
-              </article>
-
-              <!-- PRODUCTO 4 -->
-              <article class="product-card" data-product="Beverly Glutamine Select" data-sumup="https://pay.sumup.com/b2c/Q8M1P5LS">
-                <div class="product-image-wrap">
-                  <!-- EDITAR FOTO AQUÍ -->
-                  <img class="product-image" src="https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=900&q=80" alt="Beverly Glutamine Select">
-                </div>
-                <div class="product-body">
-                  <div class="product-badge">Apoyo recuperación</div>
-                  <h3 class="product-name">Beverly Glutamine Select</h3>
-                  <p class="product-text">Glutamina para complementar rutinas intensas con una integración sencilla y compatible con otros suplementos.</p>
-
-                  <!-- EDITAR SELECTOR DE SABORES AQUÍ -->
-                  <label class="field-label" for="flavor-4">Elegir sabor</label>
-                  <select class="flavor-select" id="flavor-4">
-                    <option value="Sin sabor">Sin sabor</option>
-                    <option value="Limón suave">Limón suave</option>
-                  </select>
-
-                  <div class="price-row">
-                    <div class="price-box">
-                      <p class="price-label">Precio</p>
-                      <!-- EDITAR PRECIO AQUÍ -->
-                      <p class="price-value">29,90 €</p>
-                    </div>
-                    <p class="price-note">IVA incluido<br>Pago seguro SumUp</p>
-                  </div>
-
-                  <div class="product-actions">
-                    <button class="btn-secondary" type="button" data-open-modal="modal-4">Ficha Técnica</button>
-                    <a class="btn buy-link" href="https://pay.sumup.com/b2c/Q8M1P5LS" target="_blank" rel="noopener noreferrer">Comprar (SumUp)</a>
-                  </div>
-                </div>
-              </article>
-
-              <!-- PRODUCTO 5 -->
-              <article class="product-card" data-product="Beverly Creatine Select" data-sumup="https://pay.sumup.com/b2c/Q5H3N7RA">
-                <div class="product-image-wrap">
-                  <!-- EDITAR FOTO AQUÍ -->
-                  <img class="product-image" src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&w=900&q=80" alt="Beverly Creatine Select">
-                </div>
-                <div class="product-body">
-                  <div class="product-badge">Fuerza y potencia</div>
-                  <h3 class="product-name">Beverly Creatine Select</h3>
-                  <p class="product-text">Creatina enfocada en fuerza, potencia y rendimiento acumulado, pensada para una rutina diaria muy fácil de mantener.</p>
-
-                  <!-- EDITAR SELECTOR DE SABORES AQUÍ -->
-                  <label class="field-label" for="flavor-5">Elegir formato</label>
-                  <select class="flavor-select" id="flavor-5">
-                    <option value="Sin sabor">Sin sabor</option>
-                  </select>
-
-                  <div class="price-row">
-                    <div class="price-box">
-                      <p class="price-label">Precio</p>
-                      <!-- EDITAR PRECIO AQUÍ -->
-                      <p class="price-value">27,90 €</p>
-                    </div>
-                    <p class="price-note">IVA incluido<br>Pago seguro SumUp</p>
-                  </div>
-
-                  <div class="product-actions">
-                    <button class="btn-secondary" type="button" data-open-modal="modal-5">Ficha Técnica</button>
-                    <a class="btn buy-link" href="https://pay.sumup.com/b2c/Q5H3N7RA" target="_blank" rel="noopener noreferrer">Comprar (SumUp)</a>
-                  </div>
-                </div>
-              </article>
-
-              <!-- PRODUCTO 6 -->
-              <article class="product-card" data-product="Beverly Ultra Size" data-sumup="https://pay.sumup.com/b2c/Q6K5X4TR">
-                <div class="product-image-wrap">
-                  <!-- EDITAR FOTO AQUÍ -->
-                  <img class="product-image" src="https://images.unsplash.com/photo-1579722821273-0f6c1d44362f?auto=format&fit=crop&w=900&q=80" alt="Beverly Ultra Size">
-                </div>
-                <div class="product-body">
-                  <div class="product-badge">Ganancia limpia</div>
-                  <h3 class="product-name">Beverly Ultra Size</h3>
-                  <p class="product-text">Gainer premium para etapas de superávit calórico con una imagen cuidada y una composición enfocada al rendimiento.</p>
-
-                  <!-- EDITAR SELECTOR DE SABORES AQUÍ -->
-                  <label class="field-label" for="flavor-6">Elegir sabor</label>
-                  <select class="flavor-select" id="flavor-6">
-                    <option value="Chocolate">Chocolate</option>
-                    <option value="Vainilla">Vainilla</option>
-                    <option value="Fresa">Fresa</option>
-                  </select>
-
-                  <div class="price-row">
-                    <div class="price-box">
-                      <p class="price-label">Precio</p>
-                      <!-- EDITAR PRECIO AQUÍ -->
-                      <p class="price-value">64,90 €</p>
-                    </div>
-                    <p class="price-note">IVA incluido<br>Pago seguro SumUp</p>
-                  </div>
-
-                  <div class="product-actions">
-                    <button class="btn-secondary" type="button" data-open-modal="modal-6">Ficha Técnica</button>
-                    <a class="btn buy-link" href="https://pay.sumup.com/b2c/Q6K5X4TR" target="_blank" rel="noopener noreferrer">Comprar (SumUp)</a>
-                  </div>
-                </div>
-              </article>
-
-              <!-- PRODUCTO 7 -->
-              <article class="product-card" data-product="Beverly Energy Reserve" data-sumup="https://pay.sumup.com/b2c/Q2B7F9VC">
-                <div class="product-image-wrap">
-                  <!-- EDITAR FOTO AQUÍ -->
-                  <img class="product-image" src="https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=900&q=80" alt="Beverly Energy Reserve">
-                </div>
-                <div class="product-body">
-                  <div class="product-badge">Energía entrenamiento</div>
-                  <h3 class="product-name">Beverly Energy Reserve</h3>
-                  <p class="product-text">Fórmula para apoyar sesiones de alta demanda con un perfil pensado para energía y buena disponibilidad durante el esfuerzo.</p>
-
-                  <!-- EDITAR SELECTOR DE SABORES AQUÍ -->
-                  <label class="field-label" for="flavor-7">Elegir sabor</label>
-                  <select class="flavor-select" id="flavor-7">
-                    <option value="Naranja">Naranja</option>
-                    <option value="Frutas tropicales">Frutas tropicales</option>
-                    <option value="Limón">Limón</option>
-                  </select>
-
-                  <div class="price-row">
-                    <div class="price-box">
-                      <p class="price-label">Precio</p>
-                      <!-- EDITAR PRECIO AQUÍ -->
-                      <p class="price-value">34,90 €</p>
-                    </div>
-                    <p class="price-note">IVA incluido<br>Pago seguro SumUp</p>
-                  </div>
-
-                  <div class="product-actions">
-                    <button class="btn-secondary" type="button" data-open-modal="modal-7">Ficha Técnica</button>
-                    <a class="btn buy-link" href="https://pay.sumup.com/b2c/Q2B7F9VC" target="_blank" rel="noopener noreferrer">Comprar (SumUp)</a>
-                  </div>
-                </div>
-              </article>
-
-              <!-- PRODUCTO 8 -->
-              <article class="product-card" data-product="Beverly Lean Out" data-sumup="https://pay.sumup.com/b2c/Q3T6J8EK">
-                <div class="product-image-wrap">
-                  <!-- EDITAR FOTO AQUÍ -->
-                  <img class="product-image" src="https://images.unsplash.com/photo-1514996937319-344454492b37?auto=format&fit=crop&w=900&q=80" alt="Beverly Lean Out">
-                </div>
-                <div class="product-body">
-                  <div class="product-badge">Definición premium</div>
-                  <h3 class="product-name">Beverly Lean Out</h3>
-                  <p class="product-text">Complemento orientado a etapas de definición con presencia premium y una integración sencilla en la rutina diaria.</p>
-
-                  <!-- EDITAR SELECTOR DE SABORES AQUÍ -->
-                  <label class="field-label" for="flavor-8">Elegir sabor</label>
-                  <select class="flavor-select" id="flavor-8">
-                    <option value="Cítricos">Cítricos</option>
-                    <option value="Frutas rojas">Frutas rojas</option>
-                  </select>
-
-                  <div class="price-row">
-                    <div class="price-box">
-                      <p class="price-label">Precio</p>
-                      <!-- EDITAR PRECIO AQUÍ -->
-                      <p class="price-value">39,90 €</p>
-                    </div>
-                    <p class="price-note">IVA incluido<br>Pago seguro SumUp</p>
-                  </div>
-
-                  <div class="product-actions">
-                    <button class="btn-secondary" type="button" data-open-modal="modal-8">Ficha Técnica</button>
-                    <a class="btn buy-link" href="https://pay.sumup.com/b2c/Q3T6J8EK" target="_blank" rel="noopener noreferrer">Comprar (SumUp)</a>
-                  </div>
-                </div>
-              </article>
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title"></h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
             </div>
-          </div>
-        </section>
-
-        <!-- =====================================================
-             INFORMACIÓN DE ENTREGA
-             ===================================================== -->
-        <section class="section" id="entrega">
-          <div class="container">
-            <div class="delivery-box">
-              <h2 class="section-title">Entrega y recogida</h2>
-              <p class="section-copy">
-                <strong>Recogida en mano con tu entrenador en el gimnasio.</strong>
-                Tras confirmar la compra, se coordina la entrega personal para que el cliente reciba el producto de forma cómoda,
-                directa y sin necesidad de añadir una logística de envío compleja.
-              </p>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <!-- =======================================================
-           MODALES DE FICHAS TÉCNICAS
-           ======================================================= -->
-      <div class="modal-overlay" id="modal-1" aria-hidden="true">
-        <div class="modal-panel">
-          <p class="modal-kicker">Ficha técnica</p>
-          <h3 class="modal-title">Beverly Muscle Provider</h3>
-          <p class="modal-copy">Proteína premium con perfil ideal para desayuno, merienda o post-entreno y con una experiencia de sabor muy cuidada.</p>
-          <ul class="modal-list">
-            <li>Uso habitual en planes de recomposición corporal y mantenimiento.</li>
-            <li>Textura cremosa y buena sensación de saciedad.</li>
-            <li>Encaja bien en rutinas donde se busca practicidad y sabor.</li>
-          </ul>
-          <p class="modal-copy"><strong>EDITAR FICHA TÉCNICA AQUÍ:</strong> Puedes sustituir este bloque por ingredientes, modo de empleo, advertencias o tabla nutricional.</p>
-          <div class="modal-actions">
-            <button class="btn-modal-close" type="button" data-close-modal>Cerrar ventana</button>
-            <a href="#catalogo" class="btn-secondary">Volver al catálogo</a>
-          </div>
+            <div class="modal-body" id="modal-body"></div>
         </div>
-      </div>
-
-      <div class="modal-overlay" id="modal-2" aria-hidden="true">
-        <div class="modal-panel">
-          <p class="modal-kicker">Ficha técnica</p>
-          <h3 class="modal-title">Beverly UMP Ultimate Muscle Protein</h3>
-          <p class="modal-copy">Proteína de digestión progresiva, muy interesante para cubrir horas entre comidas y para mejorar la adherencia nutricional.</p>
-          <ul class="modal-list">
-            <li>Muy utilizada en desayunos y meriendas completas.</li>
-            <li>Ayuda a mantener una ingesta proteica consistente durante el día.</li>
-            <li>Buena opción para definición controlada o mantenimiento.</li>
-          </ul>
-          <p class="modal-copy"><strong>EDITAR FICHA TÉCNICA AQUÍ:</strong> Añade composición real, alérgenos y cantidades por servicio.</p>
-          <div class="modal-actions">
-            <button class="btn-modal-close" type="button" data-close-modal>Cerrar ventana</button>
-            <a href="#catalogo" class="btn-secondary">Volver al catálogo</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-overlay" id="modal-3" aria-hidden="true">
-        <div class="modal-panel">
-          <p class="modal-kicker">Ficha técnica</p>
-          <h3 class="modal-title">Beverly Mass Amino Acids</h3>
-          <p class="modal-copy">Complejo de aminoácidos pensado para apoyar la recuperación y complementar fases de alta exigencia física.</p>
-          <ul class="modal-list">
-            <li>Orientado a deportistas de fuerza y musculación.</li>
-            <li>Se puede usar alrededor del entrenamiento o entre comidas.</li>
-            <li>Interesante en etapas de volumen o mantenimiento.</li>
-          </ul>
-          <p class="modal-copy"><strong>EDITAR FICHA TÉCNICA AQUÍ:</strong> Sustituye estas frases por datos reales del producto que quieras mostrar.</p>
-          <div class="modal-actions">
-            <button class="btn-modal-close" type="button" data-close-modal>Cerrar ventana</button>
-            <a href="#catalogo" class="btn-secondary">Volver al catálogo</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-overlay" id="modal-4" aria-hidden="true">
-        <div class="modal-panel">
-          <p class="modal-kicker">Ficha técnica</p>
-          <h3 class="modal-title">Beverly Glutamine Select</h3>
-          <p class="modal-copy">Glutamina de uso deportivo preparada para combinarse fácilmente con otros suplementos de la rutina habitual.</p>
-          <ul class="modal-list">
-            <li>Muy práctica para protocolos de recuperación.</li>
-            <li>Formato cómodo y fácil de mezclar.</li>
-            <li>Disponible en opción sin sabor o limón suave.</li>
-          </ul>
-          <p class="modal-copy"><strong>EDITAR FICHA TÉCNICA AQUÍ:</strong> Añade dosis diaria, ingredientes y recomendaciones personalizadas.</p>
-          <div class="modal-actions">
-            <button class="btn-modal-close" type="button" data-close-modal>Cerrar ventana</button>
-            <a href="#catalogo" class="btn-secondary">Volver al catálogo</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-overlay" id="modal-5" aria-hidden="true">
-        <div class="modal-panel">
-          <p class="modal-kicker">Ficha técnica</p>
-          <h3 class="modal-title">Beverly Creatine Select</h3>
-          <p class="modal-copy">Creatina para reforzar rutinas de fuerza, potencia y rendimiento acumulado con una integración muy sencilla.</p>
-          <ul class="modal-list">
-            <li>Uso diario orientado a continuidad y consistencia.</li>
-            <li>Compatible con proteína, agua o bebidas neutras.</li>
-            <li>Formato cómodo para clientes que buscan simplicidad.</li>
-          </ul>
-          <p class="modal-copy"><strong>EDITAR FICHA TÉCNICA AQUÍ:</strong> Sustituye este texto por la pauta real, advertencias y composición exacta.</p>
-          <div class="modal-actions">
-            <button class="btn-modal-close" type="button" data-close-modal>Cerrar ventana</button>
-            <a href="#catalogo" class="btn-secondary">Volver al catálogo</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-overlay" id="modal-6" aria-hidden="true">
-        <div class="modal-panel">
-          <p class="modal-kicker">Ficha técnica</p>
-          <h3 class="modal-title">Beverly Ultra Size</h3>
-          <p class="modal-copy">Gainer premium orientado a facilitar el superávit calórico con una presentación visual coherente con la marca.</p>
-          <ul class="modal-list">
-            <li>Enfocado a etapas de ganancia de masa.</li>
-            <li>Combina practicidad, sabor y densidad nutricional.</li>
-            <li>Muy útil para clientes a quienes les cuesta llegar a calorías.</li>
-          </ul>
-          <p class="modal-copy"><strong>EDITAR FICHA TÉCNICA AQUÍ:</strong> Añade gramos por toma, mezcla recomendada y composición real.</p>
-          <div class="modal-actions">
-            <button class="btn-modal-close" type="button" data-close-modal>Cerrar ventana</button>
-            <a href="#catalogo" class="btn-secondary">Volver al catálogo</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-overlay" id="modal-7" aria-hidden="true">
-        <div class="modal-panel">
-          <p class="modal-kicker">Ficha técnica</p>
-          <h3 class="modal-title">Beverly Energy Reserve</h3>
-          <p class="modal-copy">Fórmula orientada a entrenamientos largos o de alta demanda, con sabores pensados para una toma agradable.</p>
-          <ul class="modal-list">
-            <li>Buena integración antes o durante sesiones intensas.</li>
-            <li>Sabores frescos con buena disolución.</li>
-            <li>Especialmente interesante en deportes de alta exigencia.</li>
-          </ul>
-          <p class="modal-copy"><strong>EDITAR FICHA TÉCNICA AQUÍ:</strong> Puedes ampliar este bloque con ingredientes, uso recomendado y observaciones.</p>
-          <div class="modal-actions">
-            <button class="btn-modal-close" type="button" data-close-modal>Cerrar ventana</button>
-            <a href="#catalogo" class="btn-secondary">Volver al catálogo</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-overlay" id="modal-8" aria-hidden="true">
-        <div class="modal-panel">
-          <p class="modal-kicker">Ficha técnica</p>
-          <h3 class="modal-title">Beverly Lean Out</h3>
-          <p class="modal-copy">Complemento orientado a definición, control y rutina diaria, manteniendo una imagen de producto premium.</p>
-          <ul class="modal-list">
-            <li>Pensado para etapas donde se busca afinado corporal.</li>
-            <li>Fácil de añadir a una estrategia nutricional organizada.</li>
-            <li>Disponible en perfiles de sabor frescos.</li>
-          </ul>
-          <p class="modal-copy"><strong>EDITAR FICHA TÉCNICA AQUÍ:</strong> Sustituye estas frases por la información oficial del fabricante.</p>
-          <div class="modal-actions">
-            <button class="btn-modal-close" type="button" data-close-modal>Cerrar ventana</button>
-            <a href="#catalogo" class="btn-secondary">Volver al catálogo</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- PIE DE PÁGINA -->
-      <footer class="footer container">GHCnutrition · Landing móvil de venta directa · Beverly Nutrition</footer>
     </div>
 
     <script>
-      // =========================================================
-      // CAPTURA DEL REFERIDO Y ACTUALIZACIÓN DE ENLACES SUMUP
-      // =========================================================
-      (function () {
-        var params = new URLSearchParams(window.location.search);
-        var ref = params.get('ref');
+        // ============================================
+        // SISTEMA DE REFERIDOS
+        // ============================================
+        const urlParams = new URLSearchParams(window.location.search);
+        const referido = urlParams.get('ref');
 
-        // RECORREMOS TODAS LAS TARJETAS DE PRODUCTO
-        document.querySelectorAll('.product-card').forEach(function (card) {
-          var productName = card.getAttribute('data-product') || 'producto';
-          var baseUrl = card.getAttribute('data-sumup') || '';
-          var select = card.querySelector('.flavor-select');
-          var link = card.querySelector('.buy-link');
-
-          // FUNCIÓN QUE RECONSTRUYE EL ENLACE FINAL DE COMPRA
-          function updateBuyLink() {
-            if (!link || !baseUrl) return;
-
-            var url = new URL(baseUrl, window.location.origin);
-            var flavor = select ? select.value : '';
-
-            // AÑADIMOS EL NOMBRE DEL PRODUCTO
-            url.searchParams.set('product', productName);
-
-            // AÑADIMOS EL SABOR ELEGIDO
-            if (flavor) {
-              url.searchParams.set('flavor', flavor);
-            }
-
-            // AÑADIMOS EL REFERIDO SI EXISTE EN LA URL
-            if (ref) {
-              url.searchParams.set('ref', ref);
-            }
-
-            link.setAttribute('href', url.toString());
-          }
-
-          // ACTUALIZAMOS AL CARGAR
-          updateBuyLink();
-
-          // ACTUALIZAMOS CUANDO CAMBIA EL SABOR
-          if (select) {
-            select.addEventListener('change', updateBuyLink);
-          }
-        });
-
-        // =======================================================
-        // LÓGICA DE APERTURA Y CIERRE DE MODALES
-        // =======================================================
-        var body = document.body;
-
-        document.querySelectorAll('[data-open-modal]').forEach(function (button) {
-          button.addEventListener('click', function () {
-            var modalId = button.getAttribute('data-open-modal');
-            var modal = modalId ? document.getElementById(modalId) : null;
-            if (!modal) return;
-            modal.classList.add('is-open');
-            modal.setAttribute('aria-hidden', 'false');
-            body.style.overflow = 'hidden';
-          });
-        });
-
-        function closeModal(modal) {
-          modal.classList.remove('is-open');
-          modal.setAttribute('aria-hidden', 'true');
-          body.style.overflow = '';
+        // Añadir referido al botón principal de oferta
+        if (referido) {
+            const btnOferta = document.getElementById('btn-oferta-principal');
+            const currentHref = btnOferta.getAttribute('href');
+            btnOferta.setAttribute('href', `${currentHref}?ref=${referido}`);
+            console.log('Referido activo:', referido);
         }
 
-        document.querySelectorAll('[data-close-modal]').forEach(function (button) {
-          button.addEventListener('click', function () {
-            var modal = button.closest('.modal-overlay');
-            if (modal) closeModal(modal);
-          });
-        });
-
-        document.querySelectorAll('.modal-overlay').forEach(function (modal) {
-          modal.addEventListener('click', function (event) {
-            if (event.target === modal) {
-              closeModal(modal);
-            }
-          });
-        });
-
-        document.addEventListener('keydown', function (event) {
-          if (event.key !== 'Escape') return;
-          document.querySelectorAll('.modal-overlay.is-open').forEach(function (modal) {
-            closeModal(modal);
-          });
-        });
-
-        // =======================================================
-        // AVISO DE ALTURA PARA EL CONTENEDOR REACT
-        // =======================================================
-        function reportHeight() {
-          var height = Math.max(
-            document.body.scrollHeight,
-            document.documentElement.scrollHeight,
-            document.body.offsetHeight,
-            document.documentElement.offsetHeight
-          );
-
-          parent.postMessage({ type: 'ghcnutrition-height', height: height }, '*');
+        // ============================================
+        // SCROLL PROGRESS BAR
+        // ============================================
+        function updateScrollProgress() {
+            const scrollProgress = document.getElementById('scrollProgress');
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight - windowHeight;
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const progress = (scrollTop / documentHeight) * 100;
+            scrollProgress.style.width = progress + '%';
         }
 
-        window.addEventListener('load', reportHeight);
-        window.addEventListener('resize', reportHeight);
+        window.addEventListener('scroll', updateScrollProgress);
+        window.addEventListener('resize', updateScrollProgress);
 
-        var observer = new MutationObserver(reportHeight);
-        observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+        // ============================================
+        // CATÁLOGO DE PRODUCTOS
+        // EDITAR: Productos, precios y enlaces SumUp
+        // ============================================
+        const productos = [
+            {
+                id: 1,
+                nombre: "Beverly Whey Protein",
+                precio: 45,
+                imagen: "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=600&h=600&fit=crop",
+                resumen: "Proteína de suero concentrada premium. Máxima calidad para recuperación muscular.",
+                descripcion: "Beverly Whey Protein es una proteína de suero concentrada de altísima pureza. Cada porción proporciona 24g de proteína de rápida absorción, ideal para la ventana anabólica post-entreno.",
+                beneficios: [
+                    "24g de proteína por servicio con perfil aminoácido completo",
+                    "Absorción rápida para recuperación muscular inmediata",
+                    "Bajo en grasas y carbohidratos",
+                    "Sabor excepcional con mezcla instantánea",
+                    "Libre de rellenos y edulcorantes artificiales"
+                ],
+                comoTomar: "Mezclar 1 dosificador (30g) con 250ml de agua o leche. Consumir inmediatamente después del entrenamiento para máxima recuperación muscular, o entre comidas para aumentar tu ingesta proteica diaria.",
+                sabores: true,
+                sumupBase: "ghc-whey"
+            },
+            {
+                id: 2,
+                nombre: "Beverly Iso Whey",
+                precio: 40,
+                imagen: "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=600&h=600&fit=crop",
+                resumen: "Aislado de proteína 90% pureza. Cero grasas, absorción instantánea.",
+                descripcion: "Beverly Iso Whey es un aislado de proteína de suero de máxima pureza (90%+). Proceso de microfiltración en frío que preserva las fracciones proteicas bioactivas.",
+                beneficios: [
+                    "90%+ de pureza proteica - 27g por servicio",
+                    "Prácticamente cero grasas y cero carbohidratos",
+                    "Ideal para definición y dietas bajas en calorías",
+                    "Mínimo contenido de lactosa - apto para intolerantes",
+                    "Absorción ultrarrápida - menos de 30 minutos"
+                ],
+                comoTomar: "Mezclar 1 dosificador (28g) con 200-250ml de agua fría. Tomar inmediatamente post-entreno o como snack proteico entre comidas. En fase de definición: hasta 3 tomas diarias para mantener masa muscular.",
+                sabores: true,
+                sumupBase: "ghc-iso"
+            },
+            {
+                id: 3,
+                nombre: "Pure Creatine",
+                precio: 25,
+                imagen: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=600&h=600&fit=crop",
+                resumen: "Creatina monohidrato Creapure®. Incrementa fuerza explosiva.",
+                descripcion: "Pure Creatine utiliza Creapure®, la creatina monohidrato de mayor pureza del mercado (99.99%). Fabricada en Alemania bajo estrictos controles de calidad.",
+                beneficios: [
+                    "Creapure® - máxima pureza farmacéutica certificada",
+                    "Aumenta fuerza explosiva en 10-15%",
+                    "Mejora rendimiento en ejercicios de alta intensidad",
+                    "Favorece hidratación celular y volumización muscular",
+                    "Acelera recuperación entre series"
+                ],
+                comoTomar: "Tomar 5g diarios (1 dosificador raso). Mezclar con agua, zumo o añadir a tu batido de proteína. Tomar preferentemente post-entreno junto con carbohidratos de rápida absorción para máxima efectividad. Uso continuado mínimo 8 semanas.",
+                sabores: false,
+                sumupBase: "ghc-creatine"
+            },
+            {
+                id: 4,
+                nombre: "Myo-Blast Pre-Entreno",
+                precio: 28,
+                imagen: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=600&h=600&fit=crop",
+                resumen: "Pre-entreno de alto rendimiento. Energía extrema, concentración máxima.",
+                descripcion: "Myo-Blast combina cafeína, beta-alanina, citrulina malato y taurina en dosis clínicas para máxima intensidad.",
+                beneficios: [
+                    "300mg de cafeína para energía sostenida sin crash",
+                    "Beta-alanina CarnoSyn® para retrasar fatiga muscular",
+                    "6g de Citrulina Malato para pump extremo y vascularización",
+                    "Mejora concentración y conexión mente-músculo",
+                    "Aumenta resistencia muscular en 15-20%"
+                ],
+                comoTomar: "Mezclar 1 dosificador (15g) con 300ml de agua fría. Tomar 30 minutos antes del entrenamiento con el estómago vacío o semi-vacío. IMPORTANTE: No superar 1 dosis diaria. No tomar 6 horas antes de dormir.",
+                sabores: true,
+                sumupBase: "ghc-pre"
+            },
+            {
+                id: 5,
+                nombre: "V-Complex Multivitamínico",
+                precio: 15,
+                imagen: "https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=600&h=600&fit=crop",
+                resumen: "Complejo vitamínico completo. Salud óptima, sistema inmune fortalecido.",
+                descripcion: "V-Complex incluye las 13 vitaminas esenciales y 11 minerales clave en sus formas más biodisponibles.",
+                beneficios: [
+                    "100% CDR de todas las vitaminas esenciales",
+                    "Minerales quelados de alta absorción (Zinc, Magnesio, Hierro)",
+                    "Antioxidantes potentes (Vitamina C, E, Selenio)",
+                    "Optimiza metabolismo energético y recuperación",
+                    "Refuerza sistema inmune y reduce inflamación"
+                ],
+                comoTomar: "Tomar 2 cápsulas con el desayuno acompañado de alimentos. La ingesta con comida maximiza la absorción de vitaminas liposolubles (A, D, E, K). Uso diario continuado para resultados óptimos.",
+                sabores: false,
+                sumupBase: "ghc-vitamins"
+            },
+            {
+                id: 6,
+                nombre: "Colágeno con Magnesio",
+                precio: 22,
+                imagen: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=600&h=600&fit=crop",
+                resumen: "Protección articular total. Tendones fuertes, recuperación acelerada.",
+                descripcion: "Fórmula de colágeno hidrolizado tipo I y II con magnesio bioactivo para máxima absorción.",
+                beneficios: [
+                    "10g de colágeno hidrolizado de alta pureza por servicio",
+                    "Mejora salud articular y reduce dolor e inflamación",
+                    "Fortalece tendones y ligamentos - prevención de lesiones",
+                    "Magnesio para función muscular óptima y recuperación",
+                    "Mejora elasticidad y salud de la piel"
+                ],
+                comoTomar: "Disolver 1 dosificador (12g) en agua, zumo o batido. Tomar preferentemente por la mañana en ayunas para máxima absorción. Puede tomarse también antes de dormir. Uso continuado mínimo 3 meses para resultados óptimos en articulaciones.",
+                sabores: false,
+                sumupBase: "ghc-collagen"
+            },
+            {
+                id: 7,
+                nombre: "Probióticos Avanzados",
+                precio: 18,
+                imagen: "https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=600&h=600&fit=crop",
+                resumen: "Salud intestinal óptima, absorción mejorada, sistema inmune blindado.",
+                descripcion: "Fórmula probiótica con 15 cepas bacterianas y 50 mil millones de UFC por cápsula.",
+                beneficios: [
+                    "50.000 millones UFC de 15 cepas probióticas distintas",
+                    "Mejora digestión y absorción de nutrientes hasta 30%",
+                    "Fortalece sistema inmune (70% localizado en intestino)",
+                    "Reduce inflamación sistémica y mejora recuperación",
+                    "Cápsulas gastrorresistentes para máxima viabilidad"
+                ],
+                comoTomar: "Tomar 1 cápsula diaria con el desayuno o cena. Conservar en lugar fresco y seco. Para mejores resultados, combinar con dieta rica en fibra. Uso continuado mínimo 30 días para colonización intestinal efectiva.",
+                sabores: false,
+                sumupBase: "ghc-probiotics"
+            },
+            {
+                id: 8,
+                nombre: "Definition Quemador",
+                precio: 25,
+                imagen: "https://images.unsplash.com/photo-1599932164542-02f9e3fcaace?w=600&h=600&fit=crop",
+                resumen: "Termogénico potente. Acelera metabolismo, elimina grasa.",
+                descripcion: "Definition combina ingredientes científicos para maximizar oxidación de grasas preservando masa muscular.",
+                beneficios: [
+                    "Aumenta metabolismo basal en reposo hasta 8-10%",
+                    "Extracto de té verde (EGCG) y cafeína para termogénesis",
+                    "L-Carnitina para transporte de grasas a mitocondrias",
+                    "Suprime apetito y controla ansiedad por dulces",
+                    "Preserva masa muscular durante déficit calórico"
+                ],
+                comoTomar: "Tomar 2 cápsulas 30 minutos antes del desayuno con agua y 2 cápsulas 30 minutos antes de entrenar. No superar 4 cápsulas diarias. IMPORTANTE: Ciclar 8 semanas ON, 2 semanas OFF. No tomar por la tarde-noche para no afectar el sueño.",
+                sabores: false,
+                sumupBase: "ghc-burner"
+            }
+        ];
 
-        setTimeout(reportHeight, 150);
-        setTimeout(reportHeight, 600);
-      })();
+        // ============================================
+        // RENDERIZAR PRODUCTOS
+        // ============================================
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = productos.map((p, index) => `
+                <div class="product-card" data-index="${index}">
+                    <img src="${p.imagen}" alt="${p.nombre}" class="product-image">
+                    <h3>${p.nombre}</h3>
+                    <p class="product-benefit">${p.resumen}</p>
+                    <div class="product-price">${p.precio}€</div>
+                    <div class="product-actions">
+                        <button class="btn-details" onclick="openModal(${p.id})">
+                            📋 VER FICHA
+                        </button>
+                        <a href="https://sumup.me/${p.sumupBase}${referido ? '?ref=' + referido : ''}" class="btn-comprar">
+                            🛒 PAGAR AHORA
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+
+            observeCards();
+        }
+
+        // ============================================
+        // ANIMACIONES DE SCROLL
+        // ============================================
+        function observeCards() {
+            const cards = document.querySelectorAll('.product-card');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, entry.target.dataset.index * 100);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            cards.forEach(card => observer.observe(card));
+        }
+
+        // ============================================
+        // MODAL DE FICHA TÉCNICA
+        // ============================================
+        function openModal(productId) {
+            const p = productos.find(prod => prod.id === productId);
+            if (!p) return;
+
+            document.getElementById('modal-title').textContent = p.nombre;
+            
+            let selector = '';
+            if (p.sabores) {
+                selector = `
+                    <div class="flavor-selector-modal">
+                        <label for="modal-flavor-${p.id}">SELECCIONA TU SABOR:</label>
+                        <select id="modal-flavor-${p.id}" onchange="updateModalLink(${p.id})">
+                            <option value="chocolate">🍫 Chocolate</option>
+                            <option value="fresa">🍓 Fresa</option>
+                            <option value="vainilla">🍦 Vainilla</option>
+                            <option value="galletas">🍪 Cookies</option>
+                        </select>
+                    </div>
+                `;
+            }
+
+            document.getElementById('modal-body').innerHTML = `
+                <img src="${p.imagen}" alt="${p.nombre}" class="modal-image">
+                
+                <div class="modal-section">
+                    <h4>📝 DESCRIPCIÓN</h4>
+                    <p>${p.descripcion}</p>
+                </div>
+
+                <div class="modal-section">
+                    <h4>✨ BENEFICIOS CLAVE</h4>
+                    <ul>
+                        ${p.beneficios.map(b => `<li>${b}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="modal-section como-tomar">
+                    <h4>💊 CÓMO TOMAR</h4>
+                    <p>${p.comoTomar}</p>
+                </div>
+
+                ${selector}
+
+                <div class="modal-price">${p.precio}€</div>
+
+                <a href="https://sumup.me/${p.sumupBase}${p.sabores ? '-chocolate' : ''}${referido ? '?ref=' + referido : ''}" 
+                   class="btn-comprar" 
+                   id="modal-buy-${p.id}"
+                   style="width: 100%; font-size: 17px;">
+                    🛒 PAGAR AHORA
+                </a>
+            `;
+
+            document.getElementById('modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function updateModalLink(productId) {
+            const p = productos.find(prod => prod.id === productId);
+            const select = document.getElementById(`modal-flavor-${productId}`);
+            const btn = document.getElementById(`modal-buy-${productId}`);
+            btn.href = `https://sumup.me/${p.sumupBase}-${select.value}${referido ? '?ref=' + referido : ''}`;
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        renderProducts();
     </script>
-  </body>
-</html>`,
-    [],
-  );
 
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (!event.data || event.data.type !== 'ghcnutrition-height') return;
-      if (!iframeRef.current) return;
-      iframeRef.current.style.height = `${Math.max(Number(event.data.height) || 0, window.innerHeight)}px`;
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
-
-  return (
-    <iframe
-      ref={iframeRef}
-      title="GHCnutrition Landing"
-      srcDoc={html}
-      style={{ display: 'block', width: '100%', minHeight: '100vh', border: 'none', background: '#eef4f6' }}
-    />
-  );
-}
+</body>
+</html>
